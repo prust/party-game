@@ -124,7 +124,7 @@ function updateStatus() {
         if (button.pressed && !player.attack_btn_pressed) {
           player.attack_btn_pressed = true;
           for (let other_player of players)
-            if (other_player != player) {
+            if (other_player != player && isInMeleeRange(other_player, player)) {
               if (other_player.x > player.x)
                 other_player.x += 75;
               else
@@ -151,4 +151,13 @@ function updateStatus() {
   }
 
   draw();
+}
+
+function isInMeleeRange(other_player, player) {
+  let is_vert_overlap = Math.abs(other_player.y - player.y) < player_width;
+  let dist = other_player.x - player.x;
+  if (player.direction == 1)
+    return is_vert_overlap && dist < player_width && dist > 0;
+  else
+    return is_vert_overlap && dist > -player_width && dist < 0;
 }
