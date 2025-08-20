@@ -104,7 +104,8 @@ function updateStatus() {
     for (const [i, axis] of gamepad.axes.entries()) {
       if (i == 0 && (axis > 0.2 || axis < -0.2))
         player.x += axis * 10;
-      if (i == 2 && (axis > 0.2 || axis < -0.2))
+      // i == 2 for dual-stick
+      if (i == 0 && (axis > 0.2 || axis < -0.2))
         player.direction = axis > 0 ? 1 : -1;
     }
 
@@ -117,6 +118,17 @@ function updateStatus() {
         }
         else if (!button.pressed && player.jump_btn_pressed) {
           player.jump_btn_pressed = false;
+        }
+      }
+      else if (i == 1) {
+        if (button.pressed && !player.attack_btn_pressed) {
+          player.attack_btn_pressed = true;
+          for (let other_player of players)
+            if (other_player != player)
+              other_player.y -= 50;
+        }
+        else if (!button.pressed && player.attack_btn_pressed) {
+          player.attack_btn_pressed = false;
         }
       }
     }
