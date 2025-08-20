@@ -65,7 +65,7 @@ function draw() {
   // draw the players
   for (let player of players) {
     // don't draw dead players
-    if (player.health <= 0)
+    if (isDead(player))
       continue;
 
     ctx.fillStyle = player.color;
@@ -75,7 +75,7 @@ function draw() {
   // draw players' weapons on top
   for (let player of players) {
     // don't draw dead players
-    if (player.health <= 0)
+    if (isDead(player))
       continue;
 
     ctx.fillStyle = player.color;
@@ -104,9 +104,9 @@ function draw() {
     ctx.restore();
   }
 
-  let live_players = players.filter(player => player.health > 0);
+  let live_players = players.filter(player => !isDead(player));
   if (players.length > 1 && live_players.length == 1) {
-    ctx.font = "50px sans-serif";
+    ctx.font = "500px sans-serif";
     ctx.fillStyle = live_players[0].color;
     ctx.fillText(`Player ${live_players[0].ix + 1} wins!`, canvas.width / 3, canvas.height / 3, canvas.width / 3);
   }
@@ -129,6 +129,7 @@ function updateStatus() {
     if (!gamepad) continue;
 
     let player = players.find(player => player.gamepad_ix == gamepad.index);
+
     for (const [i, axis] of gamepad.axes.entries()) {
       if (i == 0 && (axis > 0.2 || axis < -0.2))
         player.x += axis * 10;
@@ -148,7 +149,7 @@ function updateStatus() {
           player.jump_btn_pressed = false;
         }
       }
-      else if (i == 2) {
+      else if (i == 2 && !isDead(player)) {
         if (button.pressed && !player.attack_btn_pressed) {
           player.attack_btn_pressed = true;
           for (let other_player of players)
@@ -192,4 +193,8 @@ function isInMeleeRange(other_player, player) {
   else
     is_facing_other_player = other_player.x <= player.x;
   return is_vert_overlap && is_facing_other_player && dist < player_width;
+}
+
+function isDead(player) {
+  return player.health <= 0;
 }
