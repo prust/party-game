@@ -106,9 +106,9 @@ function draw() {
 
   let live_players = players.filter(player => !isDead(player));
   if (players.length > 1 && live_players.length == 1) {
-    ctx.font = "500px sans-serif";
+    ctx.font = "100px sans-serif";
     ctx.fillStyle = live_players[0].color;
-    ctx.fillText(`Player ${live_players[0].ix + 1} wins!`, canvas.width / 3, canvas.height / 3, canvas.width / 3);
+    ctx.fillText(`Player ${live_players[0].ix + 1} wins!`, canvas.width / 3, canvas.height / 3);
   }
 }
 
