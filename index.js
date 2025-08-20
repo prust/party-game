@@ -6,13 +6,14 @@ let ctx = canvas.getContext("2d");
 let player_height = 30;
 let player_width = 30;
 let margin = 100;
+let melee_damage = 10;
 
 // TODO:
 // * slicing animation
-// * aiming up or down with melee weapon
+// * aiming up or down via left knob
 // * ranged weapon
-// * inflict damage
-// * knockback
+// * inflict damage - flashing or white
+// * health (# lives or hits)
 
 let players = [];
 let ground = {
@@ -32,16 +33,19 @@ window.addEventListener("gamepadconnected", (evt) => {
     y: innerHeight-margin-player_height,
     gamepad_ix: evt.gamepad.index,
     jump_btn_pressed: false,
-    direction: 1
+    direction: 1,
+    health: 100,
   };
 
   if (players.length) {
     player.x = innerWidth-margin-player_width;
     player.color = "#df0d0d";
+    player.ix = 1;
   }
   else {
     player.x = margin;
     player.color = "#0dae4d";
+    player.ix = 0;
   }
 
   players.push(player);
@@ -66,6 +70,18 @@ function draw() {
 
   // draw players' weapons on top
   for (let player of players) {
+    // don't draw dead players
+    if (player.health <= 0)
+      continue;
+
+    ctx.fillStyle = player.color;
+
+    // draw health bar
+    if (player.ix == 0)
+      ctx.fillRect(player_width, player_height, player_width * 8 * player.health / 100, player_height);
+    else if (player.ix == 1)
+      ctx.fillRect(canvas.width - player_width, player_height, player_width * 8 * player.health / 100, player_height);
+
     let {x, y} = player;
     if (player.direction > 0)
       x += player_width;
@@ -75,7 +91,7 @@ function draw() {
     let height = player_height / 5;
     let angle = player.direction > 0 ? -30 : 30;
 
-    ctx.fillStyle = player.color;
+    
     ctx.save();
     ctx.translate(x + width/2, y + height/2); // origin of rotation on one side
     ctx.rotate(angle * Math.PI / 180);
@@ -125,6 +141,7 @@ function updateStatus() {
           player.attack_btn_pressed = true;
           for (let other_player of players)
             if (other_player != player && isInMeleeRange(other_player, player)) {
+              other_player.health -= melee_damage;
               if (other_player.x > player.x)
                 other_player.x += 75;
               else
