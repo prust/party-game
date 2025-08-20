@@ -207,7 +207,7 @@ function updateStatus() {
   for (let bullet of bullets) {
     bullet.x += 15 * bullet.direction;
     for (let player of players) {
-      if (isOverlapping(player, bullet)) {
+      if (!isDead(player) && bullet.player_ix != player.ix && isOverlapping(player, bullet)) {
         player.health -= ranged_damage;
         bullets_to_remove.push(bullet);
       }
