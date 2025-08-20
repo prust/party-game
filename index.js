@@ -8,7 +8,8 @@ let player_width = 30;
 let bullet_width = 7;
 let bullet_height = 7;
 let margin = 100;
-let melee_damage = 10;
+let melee_damage = 5;
+let ranged_damage = 5;
 
 // TODO:
 // * slicing animation
@@ -40,6 +41,8 @@ window.addEventListener("gamepadconnected", (evt) => {
     health: 100,
     melee_btn_pressed: false,
     ranged_btn_pressed: false,
+    width: player_width,
+    height: player_height,
   };
 
   if (players.length) {
@@ -179,7 +182,7 @@ function updateStatus() {
       else if (i == 7 && !isDead(player)) {
         if (button.pressed && !player.ranged_btn_pressed) {
           player.ranged_btn_pressed = true;
-          bullets.push({player_ix: player.ix, color: player.color, x: player.x, y: player.y, direction: player.direction});
+          bullets.push({player_ix: player.ix, color: player.color, x: player.x, y: player.y, width: bullet_width, height: bullet_height, direction: player.direction});
         }
         else if (!button.pressed && player.ranged_btn_pressed) {
           player.ranged_btn_pressed = false;
@@ -200,9 +203,19 @@ function updateStatus() {
       player.y += player.dy;
   }
 
+  let bullets_to_remove = [];
   for (let bullet of bullets) {
     bullet.x += 15 * bullet.direction;
+    for (let player of players) {
+      if (isOverlapping(player, bullet)) {
+        player.health -= ranged_damage;
+        bullets_to_remove.push(bullet);
+      }
+    }
   }
+
+  for (let bullet of bullets_to_remove)
+    bullets.splice(bullets.indexOf(bullet), 1);
 
   draw();
 }
@@ -221,4 +234,11 @@ function isInMeleeRange(other_player, player) {
 
 function isDead(player) {
   return player.health <= 0;
+}
+
+function isOverlapping(rect1, rect2) {
+  return !(rect2.x > (rect1.x + rect1.width) || 
+           (rect2.x + rect2.width) < rect1.x || 
+           rect2.y > (rect1.y + rect1.height) || 
+           (rect2.y + rect2.height) < rect1.y);
 }
