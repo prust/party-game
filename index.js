@@ -120,12 +120,12 @@ function updateStatus() {
           player.jump_btn_pressed = false;
         }
       }
-      else if (i == 1) {
+      else if (i == 3) {
         if (button.pressed && !player.attack_btn_pressed) {
           player.attack_btn_pressed = true;
           for (let other_player of players)
             if (other_player != player)
-              other_player.y -= 50;
+              other_player.x -= 75;
         }
         else if (!button.pressed && player.attack_btn_pressed) {
           player.attack_btn_pressed = false;
