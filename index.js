@@ -155,9 +155,12 @@ function updateStatus() {
 
 function isInMeleeRange(other_player, player) {
   let is_vert_overlap = Math.abs(other_player.y - player.y) < player_width;
-  let dist = other_player.x - player.x;
+  // to get dist *between* take the x diff (left-most points) and subtract player width
+  let dist = Math.abs(other_player.x - player.x) - player_width;
+  let is_facing_other_player;
   if (player.direction == 1)
-    return is_vert_overlap && dist < player_width && dist > 0;
+    is_facing_other_player = other_player.x >= player.x;
   else
-    return is_vert_overlap && dist > -player_width && dist < 0;
+    is_facing_other_player = other_player.x <= player.x;
+  return is_vert_overlap && is_facing_other_player && dist < player_width;
 }
