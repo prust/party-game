@@ -120,12 +120,16 @@ function updateStatus() {
           player.jump_btn_pressed = false;
         }
       }
-      else if (i == 3) {
+      else if (i == 2) {
         if (button.pressed && !player.attack_btn_pressed) {
           player.attack_btn_pressed = true;
           for (let other_player of players)
-            if (other_player != player)
-              other_player.x -= 75;
+            if (other_player != player) {
+              if (other_player.x > player.x)
+                other_player.x += 75;
+              else
+                other_player.x -= 75;
+            }
         }
         else if (!button.pressed && player.attack_btn_pressed) {
           player.attack_btn_pressed = false;
