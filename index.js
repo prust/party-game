@@ -201,7 +201,7 @@ function updateStatus() {
   }
 
   for (let bullet of bullets) {
-    bullet.y += 1 * bullet.direction;
+    bullet.x += 15 * bullet.direction;
   }
 
   draw();
