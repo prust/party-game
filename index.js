@@ -30,7 +30,7 @@ window.addEventListener("gamepadconnected", (evt) => {
   let player = {
     dy: 2,
     y: innerHeight-margin-player_height,
-    gamepad_id: evt.gamepad.id,
+    gamepad_ix: evt.gamepad.index,
     jump_btn_pressed: false,
     direction: 1
   };
@@ -100,7 +100,7 @@ function updateStatus() {
   for (let gamepad of navigator.getGamepads()) {
     if (!gamepad) continue;
 
-    let player = players.find(player => player.gamepad_id == gamepad.id);
+    let player = players.find(player => player.gamepad_ix == gamepad.index);
     for (const [i, axis] of gamepad.axes.entries()) {
       if (i == 0 && (axis > 0.2 || axis < -0.2))
         player.x += axis * 10;
