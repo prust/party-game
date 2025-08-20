@@ -12,11 +12,13 @@ let melee_damage = 10;
 let ranged_damage = 5;
 
 // TODO:
+// * sound effects
+// * music
 // * slicing animation
 // * aiming up or down via left knob
-// * ranged weapon
-// * inflict damage - flashing or white
-// * health (# lives or hits)
+// * taking damage animation (flashing white?)
+// * powerups
+// * game studio logo
 
 let players = [];
 let bullets = [];
