@@ -5,6 +5,8 @@ let ctx = canvas.getContext("2d");
 
 let player_height = 30;
 let player_width = 30;
+let bullet_width = 7;
+let bullet_height = 7;
 let margin = 100;
 let melee_damage = 10;
 
@@ -16,6 +18,7 @@ let melee_damage = 10;
 // * health (# lives or hits)
 
 let players = [];
+let bullets = [];
 let ground = {
   x: 0,
   y: innerHeight-margin,
@@ -35,6 +38,8 @@ window.addEventListener("gamepadconnected", (evt) => {
     jump_btn_pressed: false,
     direction: 1,
     health: 100,
+    melee_btn_pressed: false,
+    ranged_btn_pressed: false,
   };
 
   if (players.length) {
@@ -70,6 +75,12 @@ function draw() {
 
     ctx.fillStyle = player.color;
     ctx.fillRect(player.x,player.y, player_width,player_height);
+  }
+
+  // draw bullets behind players & melee weapons
+  for (let bullet of bullets) {
+    ctx.fillStyle = bullet.color;
+    ctx.fillRect(bullet.x, bullet.y, bullet_width, bullet_height);
   }
 
   // draw players' weapons on top
@@ -150,8 +161,8 @@ function updateStatus() {
         }
       }
       else if (i == 2 && !isDead(player)) {
-        if (button.pressed && !player.attack_btn_pressed) {
-          player.attack_btn_pressed = true;
+        if (button.pressed && !player.melee_btn_pressed) {
+          player.melee_btn_pressed = true;
           for (let other_player of players)
             if (other_player != player && isInMeleeRange(other_player, player)) {
               other_player.health -= melee_damage;
@@ -161,8 +172,17 @@ function updateStatus() {
                 other_player.x -= 75;
             }
         }
-        else if (!button.pressed && player.attack_btn_pressed) {
-          player.attack_btn_pressed = false;
+        else if (!button.pressed && player.melee_btn_pressed) {
+          player.melee_btn_pressed = false;
+        }
+      }
+      else if (i == 7 && !isDead(player)) {
+        if (button.pressed && !player.ranged_btn_pressed) {
+          player.ranged_btn_pressed = true;
+          bullets.push({player_ix: player.ix, color: player.color, x: player.x, y: player.y, direction: player.direction});
+        }
+        else if (!button.pressed && player.ranged_btn_pressed) {
+          player.ranged_btn_pressed = false;
         }
       }
     }
@@ -178,6 +198,10 @@ function updateStatus() {
       player.y = ground.y - player_height;
     else
       player.y += player.dy;
+  }
+
+  for (let bullet of bullets) {
+    bullet.y += 1 * bullet.direction;
   }
 
   draw();
