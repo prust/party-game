@@ -103,6 +103,13 @@ function draw() {
     ctx.fillRect(-width/2, -height/2, width, height); // draw rect centered at (0,0)
     ctx.restore();
   }
+
+  let live_players = players.filter(player => player.health > 0);
+  if (players.length > 1 && live_players.length == 1) {
+    ctx.font = "50px sans-serif";
+    ctx.fillStyle = live_players[0].color;
+    ctx.fillText(`Player ${live_players[0].ix + 1} wins!`, canvas.width / 3, canvas.height / 3, canvas.width / 3);
+  }
 }
 
 window.addEventListener("gamepaddisconnected", (evt) => {
