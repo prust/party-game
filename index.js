@@ -8,7 +8,7 @@ let player_width = 30;
 let bullet_width = 7;
 let bullet_height = 7;
 let margin = 100;
-let melee_damage = 5;
+let melee_damage = 10;
 let ranged_damage = 5;
 
 // TODO:
@@ -229,7 +229,7 @@ function isInMeleeRange(other_player, player) {
     is_facing_other_player = other_player.x >= player.x;
   else
     is_facing_other_player = other_player.x <= player.x;
-  return is_vert_overlap && is_facing_other_player && dist < player_width;
+  return is_vert_overlap && is_facing_other_player && dist <= (player_width * 1.5);
 }
 
 function isDead(player) {
