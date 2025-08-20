@@ -64,6 +64,10 @@ function draw() {
   
   // draw the players
   for (let player of players) {
+    // don't draw dead players
+    if (player.health <= 0)
+      continue;
+    
     ctx.fillStyle = player.color;
     ctx.fillRect(player.x,player.y, player_width,player_height);
   }
@@ -77,10 +81,11 @@ function draw() {
     ctx.fillStyle = player.color;
 
     // draw health bar
+    let bar_width = player_width * 8 * player.health / 100;
     if (player.ix == 0)
-      ctx.fillRect(player_width, player_height, player_width * 8 * player.health / 100, player_height);
+      ctx.fillRect(player_width, player_height, bar_width, player_height);
     else if (player.ix == 1)
-      ctx.fillRect(canvas.width - player_width, player_height, player_width * 8 * player.health / 100, player_height);
+      ctx.fillRect(canvas.width - bar_width, player_height, bar_width, player_height);
 
     let {x, y} = player;
     if (player.direction > 0)
