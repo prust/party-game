@@ -14,8 +14,19 @@ let margin = 100;
 let melee_damage = 10;
 let ranged_damage = 5;
 
+let num_platforms = _.random(4, 8);
+let platforms = _.range(num_platforms).map(function() {
+  let width = _.random(player_width * 4, innerWidth / 2);
+  return {
+    height: player_height,
+    width,
+    x: _.random(0, innerWidth - width),
+    y: _.random(player_height, innerHeight - margin - player_height)
+  };
+});
+
 // TODO:
-// * sound effects
+// * platforms
 // * music
 // * slicing animation
 // * aiming up or down via left knob
@@ -74,6 +85,10 @@ function draw() {
   // draw the ground
   ctx.fillStyle = ground.color;
   ctx.fillRect(ground.x, ground.y, ground.width, ground.height);
+
+  // draw platforms
+  for (let platform of platforms)
+    ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
   
   // draw the players
   for (let player of players) {
