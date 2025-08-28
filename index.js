@@ -3,6 +3,9 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 let ctx = canvas.getContext("2d");
 
+let hurt_sound = new Audio('hitHurt.wav');
+let shoot_sound = new Audio('laserShoot.wav');
+
 let player_height = 30;
 let player_width = 30;
 let bullet_width = 7;
@@ -171,6 +174,7 @@ function updateStatus() {
           for (let other_player of players)
             if (other_player != player && isInMeleeRange(other_player, player)) {
               other_player.health -= melee_damage;
+              hurt_sound.play();
               if (other_player.x > player.x)
                 other_player.x += 75;
               else
@@ -184,6 +188,7 @@ function updateStatus() {
       else if (i == 7 && !isDead(player)) {
         if (button.pressed && !player.ranged_btn_pressed) {
           player.ranged_btn_pressed = true;
+          shoot_sound.play();
           bullets.push({player_ix: player.ix, color: player.color, x: player.x, y: player.y, width: bullet_width, height: bullet_height, direction: player.direction});
         }
         else if (!button.pressed && player.ranged_btn_pressed) {
