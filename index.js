@@ -221,13 +221,13 @@ function updateStatus() {
     if (player.dy < gravity)
       player.dy += 0.5;
 
-    let colliding_platform;
-    // only collide w/ platforms if player is moving downwards (dy > 0)
-    // players can move upwards through platforms without colliding
+    let landing_platform;
+    // only land on a platform if the player is moving downwards (dy > 0)
+    // (players move upwards through platforms without landing on them)
     if (player.dy > 0) {
-      // collide if original position of player was above platform and
+      // land on platform if original position of player was above platform and
       // destination of player is overlapping the top of the platform
-      colliding_platform = platforms.find(function(platform) {
+      landing_platform = platforms.find(function(platform) {
         let is_above = player.y + player.height <= platform.y;
         let dest_y = player.y + player.dy;
         let will_overlap_top = getXOverlap(player, platform) > 0 && dest_y <= platform.y && dest_y + player.height >= platform.y;
@@ -235,8 +235,8 @@ function updateStatus() {
       });
     }
 
-    if (colliding_platform)
-      player.y = colliding_platform.y - player_height;
+    if (landing_platform)
+      player.y = landing_platform.y - player_height;
     else
       player.y += player.dy;
   }
