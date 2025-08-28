@@ -28,7 +28,8 @@ let platforms = _.range(num_platforms).map(function() {
 });
 
 // TODO:
-// * platforms
+// * make ground just another platform
+// * make it so you can jump if you're touching a platform
 // * music
 // * slicing animation
 // * aiming up or down via left knob
@@ -177,7 +178,8 @@ function updateStatus() {
     for (const [i, button] of gamepad.buttons.entries()) {
       if (i == 0) {
         let is_touching_ground = player.y + player_height == ground.y;
-        if (button.pressed && !player.jump_btn_pressed && is_touching_ground) {
+        let is_touching_platform = platforms.some(platform => player.y + player_height == platform.y);
+        if (button.pressed && !player.jump_btn_pressed && (is_touching_ground || is_touching_platform)) {
           player.jump_btn_pressed = true;
           player.dy = -15;
         }
