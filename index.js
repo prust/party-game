@@ -221,15 +221,22 @@ function updateStatus() {
     if (player.dy < gravity)
       player.dy += 0.5;
 
-    let player_goal = {...player, y: player.y + player.dy};
-    let overlapping_platform = platforms.find(function(platform) {
-      let player_was_above_platform = player.y + player.height <= platform.y;
-      let is_overlapping = player.dy > 0 && player_was_above_platform && isOverlappingTop(player_goal, platform);
-      return is_overlapping;
-    });
+    let colliding_platform;
+    // only collide w/ platforms if player is moving downwards (dy > 0)
+    // players can move upwards through platforms without colliding
+    if (player.dy > 0) {
+      // collide if original position of player was above platform and
+      // destination of player is overlapping the top of the platform
+      colliding_platform = platforms.find(function(platform) {
+        let is_above = player.y + player.height <= platform.y;
+        let dest_y = player.y + player.dy;
+        let will_overlap_top = getXOverlap(player, platform) > 0 && dest_y <= platform.y && dest_y + player.height >= platform.y;
+        return is_above && will_overlap_top;
+      });
+    }
 
-    if (overlapping_platform)
-      player.y = overlapping_platform.y - player_height;
+    if (colliding_platform)
+      player.y = colliding_platform.y - player_height;
     else
       player.y += player.dy;
   }
@@ -272,10 +279,6 @@ function isOverlapping(rect1, rect2) {
   return getXOverlap(rect1, rect2) > 0 && getYOverlap(rect1, rect2) > 0;
 }
 
-function isOverlappingTop(rect1, rect2) {
-  return getXOverlap(rect1, rect2) > 0 && rect1.y <= rect2.y && rect1.y + rect1.height >= rect2.y;
-}
-
 // the axis with the least overlap is the normal
 function getNormalAxis(rect1, rect2) {
   return getXOverlap(rect1, rect2) < getYOverlap(rect1, rect2) ? 'x' : 'y';
@@ -289,10 +292,7 @@ function getYOverlap(rect1, rect2) {
   return Math.min(rect1.y + rect1.height, rect2.y + rect2.height) - Math.max(rect1.y, rect2.y);
 }
 
-function isPlaying(audio) {
-  return audio.currentTime > 0 && !audio.paused && !audio.ended;
-}
-
 function isNotPlaying(audio) {
-  return !isPlaying(audio);
+  let is_playing = audio.currentTime > 0 && !audio.paused && !audio.ended;
+  return !is_playing;
 }
