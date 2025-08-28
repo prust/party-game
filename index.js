@@ -40,6 +40,8 @@ platforms.push({
 // TODO:
 // * platforms can't be stacked on top of each-other
 // * fix bugs where you fall next to a platform & it bumps you back to the top of the platform only to fall again infinitely
+//   * also, bug if you jump and then start descending while overlapping a platform above you
+//   * this could be fixed by comparing the top edge of the platform and whether your bottom edge *was* above it & now is below it
 // * music
 // * slicing animation
 // * aiming up or down via left knob
@@ -224,21 +226,15 @@ function updateStatus() {
 
     let player_goal = {...player, y: player.y + player.dy};
     let overlapping_platform = platforms.find(function(platform) {
-      return player.dy > 0 && isOverlapping(platform, player_goal);
+      let player_was_above_platform = player.y + player.height >= platform.y;
+      let is_overlapping = player.dy > 0 && player_was_above_platform && isOverlappingTop(player_goal, platform);
+      return is_overlapping;
     });
 
-    let collision_normal_axis = overlapping_platform && getNormalAxis(overlapping_platform, player_goal);
-    if (overlapping_platform && collision_normal_axis == 'y')
+    if (overlapping_platform)
       player.y = overlapping_platform.y - player_height;
     else
       player.y += player.dy;
-
-    if (collision_normal_axis == 'x') {
-      if (player.x > overlapping_platform.x)
-        player.x += getXOverlap(player, overlapping_platform);
-      else
-        player.x -= getXOverlap(player, overlapping_platform);
-    }
   }
 
   let bullets_to_remove = [];
@@ -275,44 +271,24 @@ function isDead(player) {
 }
 
 function isOverlapping(rect1, rect2) {
-  return isXOverlapping(rect1, rect2) && isYOverlapping(rect1, rect2);
-  // return !(rect2.x > (rect1.x + rect1.width) || 
-  //          (rect2.x + rect2.width) < rect1.x || 
-  //          rect2.y > (rect1.y + rect1.height) || 
-  //          (rect2.y + rect2.height) < rect1.y);
+  return getXOverlap(rect1, rect2) > 0 && getYOverlap(rect1, rect2) > 0;
 }
 
-// these functions could instead run the x_overlap calc below & see if it's > 0
-function isXOverlapping(rect1, rect2) {
-  return !(rect2.x > (rect1.x + rect1.width) || 
-           (rect2.x + rect2.width) < rect1.x)
-}
-
-function isYOverlapping(rect1, rect2) {
-  return !(rect2.y > (rect1.y + rect1.height) || 
-           (rect2.y + rect2.height) < rect1.y);
+function isOverlappingTop(rect1, rect2) {
+  return getXOverlap(rect1, rect2) > 0 && rect1.y <= rect2.y && rect1.y + rect1.height >= rect2.y;
 }
 
 // the axis with the least overlap is the normal
 function getNormalAxis(rect1, rect2) {
-  let x_overlap = getXOverlap(rect1, rect2);
-  let y_overlap = Math.min(bottom(rect1), bottom(rect2)) - Math.max(top(rect1), top(rect2));
-  if (x_overlap < y_overlap)
-    return 'x';
-  else
-    return 'y';
-
-  // top already been declared?
-  function top(rect) {
-    return rect.y;
-  }
-  function bottom(rect) {
-    return rect.y + rect.height;
-  }
+  return getXOverlap(rect1, rect2) < getYOverlap(rect1, rect2) ? 'x' : 'y';
 }
 
 function getXOverlap(rect1, rect2) {
-  return Math.min(right(rect1), right(rect2)) - Math.max(left(rect1), left(rect2));
+  return Math.min(rect1.x + rect1.width, rect2.x + rect2.width) - Math.max(rect1.x, rect2.x);
+}
+
+function getYOverlap(rect1, rect2) {
+  return Math.min(rect1.y + rect1.height, rect2.y + rect2.height) - Math.max(rect1.y, rect2.y);
 }
 
 function isPlaying(audio) {
@@ -321,11 +297,4 @@ function isPlaying(audio) {
 
 function isNotPlaying(audio) {
   return !isPlaying(audio);
-}
-
-function right(rect) {
-  return rect.x + rect.width;
-}
-function left(rect) {
-  return rect.x;
 }
