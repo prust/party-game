@@ -29,7 +29,8 @@ let platforms = _.range(num_platforms).map(function() {
 
 // TODO:
 // * make ground just another platform
-// * make it so you can jump if you're touching a platform
+// * platforms can't be stacked on top of each-other
+// * fix bugs where you fall next to a platform & it bumps you back to the top of the platform only to fall again infinitely
 // * music
 // * slicing animation
 // * aiming up or down via left knob
