@@ -216,15 +216,28 @@ function updateStatus() {
   }
 
   // updates
+  let ground_platforms = [...platforms, ground];
   for (let player of players) {
     if (player.dy < gravity)
       player.dy += 0.5;
 
-    // handle collisions with the ground
-    if (player.y + player_height + player.dy >= ground.y)
-      player.y = ground.y - player_height;
+    let player_goal = {...player, y: player.y + player.dy};
+    let overlapping_platform = ground_platforms.find(function(platform) {
+      return player.dy > 0 && isOverlapping(platform, player_goal);
+    });
+
+    let collision_normal_axis = overlapping_platform && getNormalAxis(overlapping_platform, player_goal);
+    if (overlapping_platform && collision_normal_axis == 'y')
+      player.y = overlapping_platform.y - player_height;
     else
       player.y += player.dy;
+
+    if (collision_normal_axis == 'x') {
+      if (player.x > overlapping_platform.x)
+        player.x += getXOverlap(player, overlapping_platform);
+      else
+        player.x -= getXOverlap(player, overlapping_platform);
+    }
   }
 
   let bullets_to_remove = [];
@@ -261,10 +274,44 @@ function isDead(player) {
 }
 
 function isOverlapping(rect1, rect2) {
+  return isXOverlapping(rect1, rect2) && isYOverlapping(rect1, rect2);
+  // return !(rect2.x > (rect1.x + rect1.width) || 
+  //          (rect2.x + rect2.width) < rect1.x || 
+  //          rect2.y > (rect1.y + rect1.height) || 
+  //          (rect2.y + rect2.height) < rect1.y);
+}
+
+// these functions could instead run the x_overlap calc below & see if it's > 0
+function isXOverlapping(rect1, rect2) {
   return !(rect2.x > (rect1.x + rect1.width) || 
-           (rect2.x + rect2.width) < rect1.x || 
-           rect2.y > (rect1.y + rect1.height) || 
+           (rect2.x + rect2.width) < rect1.x)
+}
+
+function isYOverlapping(rect1, rect2) {
+  return !(rect2.y > (rect1.y + rect1.height) || 
            (rect2.y + rect2.height) < rect1.y);
+}
+
+// the axis with the least overlap is the normal
+function getNormalAxis(rect1, rect2) {
+  let x_overlap = getXOverlap(rect1, rect2);
+  let y_overlap = Math.min(bottom(rect1), bottom(rect2)) - Math.max(top(rect1), top(rect2));
+  if (x_overlap < y_overlap)
+    return 'x';
+  else
+    return 'y';
+
+  // top already been declared?
+  function top(rect) {
+    return rect.y;
+  }
+  function bottom(rect) {
+    return rect.y + rect.height;
+  }
+}
+
+function getXOverlap(rect1, rect2) {
+  return Math.min(right(rect1), right(rect2)) - Math.max(left(rect1), left(rect2));
 }
 
 function isPlaying(audio) {
@@ -273,4 +320,11 @@ function isPlaying(audio) {
 
 function isNotPlaying(audio) {
   return !isPlaying(audio);
+}
+
+function right(rect) {
+  return rect.x + rect.width;
+}
+function left(rect) {
+  return rect.x;
 }
