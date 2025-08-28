@@ -38,10 +38,7 @@ platforms.push({
 });
 
 // TODO:
-// * platforms can't be stacked on top of each-other
-// * fix bugs where you fall next to a platform & it bumps you back to the top of the platform only to fall again infinitely
-//   * also, bug if you jump and then start descending while overlapping a platform above you
-//   * this could be fixed by comparing the top edge of the platform and whether your bottom edge *was* above it & now is below it
+// * don't allow platforms to be stacked on top of each-other
 // * music
 // * slicing animation
 // * aiming up or down via left knob
