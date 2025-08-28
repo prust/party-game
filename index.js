@@ -17,11 +17,13 @@ let ranged_damage = 5;
 let num_platforms = _.random(4, 8);
 let platforms = _.range(num_platforms).map(function() {
   let width = _.random(player_width * 4, innerWidth / 2);
+  let y = _.random(player_height, innerHeight - margin - player_height);
+  y -= y % player_height;
   return {
     height: player_height,
     width,
     x: _.random(0, innerWidth - width),
-    y: _.random(player_height, innerHeight - margin - player_height)
+    y
   };
 });
 
