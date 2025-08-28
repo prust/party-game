@@ -3,8 +3,8 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 let ctx = canvas.getContext("2d");
 
-let hurt_sound = new Audio('hitHurt.wav');
-let shoot_sound = new Audio('laserShoot.wav');
+let hurt_sounds = _.range(10).map(() => new Audio('hitHurt.wav'));
+let shoot_sounds = _.range(10).map(() => new Audio('laserShoot.wav'));
 
 let player_height = 30;
 let player_width = 30;
@@ -174,7 +174,7 @@ function updateStatus() {
           for (let other_player of players)
             if (other_player != player && isInMeleeRange(other_player, player)) {
               other_player.health -= melee_damage;
-              hurt_sound.play();
+              hurt_sounds.find(isNotPlaying)?.play();
               if (other_player.x > player.x)
                 other_player.x += 75;
               else
@@ -188,7 +188,7 @@ function updateStatus() {
       else if (i == 7 && !isDead(player)) {
         if (button.pressed && !player.ranged_btn_pressed) {
           player.ranged_btn_pressed = true;
-          shoot_sound.play();
+          shoot_sounds.find(isNotPlaying)?.play();
           bullets.push({player_ix: player.ix, color: player.color, x: player.x, y: player.y, width: bullet_width, height: bullet_height, direction: player.direction});
         }
         else if (!button.pressed && player.ranged_btn_pressed) {
@@ -248,4 +248,12 @@ function isOverlapping(rect1, rect2) {
            (rect2.x + rect2.width) < rect1.x || 
            rect2.y > (rect1.y + rect1.height) || 
            (rect2.y + rect2.height) < rect1.y);
+}
+
+function isPlaying(audio) {
+  return audio.currentTime > 0 && !audio.paused && !audio.ended;
+}
+
+function isNotPlaying(audio) {
+  return !isPlaying(audio);
 }
