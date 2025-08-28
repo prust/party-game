@@ -226,7 +226,7 @@ function updateStatus() {
 
     let player_goal = {...player, y: player.y + player.dy};
     let overlapping_platform = platforms.find(function(platform) {
-      let player_was_above_platform = player.y + player.height >= platform.y;
+      let player_was_above_platform = player.y + player.height <= platform.y;
       let is_overlapping = player.dy > 0 && player_was_above_platform && isOverlappingTop(player_goal, platform);
       return is_overlapping;
     });
@@ -236,6 +236,7 @@ function updateStatus() {
     else
       player.y += player.dy;
   }
+
 
   let bullets_to_remove = [];
   for (let bullet of bullets) {
