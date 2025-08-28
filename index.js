@@ -23,12 +23,21 @@ let platforms = _.range(num_platforms).map(function() {
     height: player_height,
     width,
     x: _.random(0, innerWidth - width),
-    y
+    y,
+    color: '#bebebe'
   };
 });
 
+// ground
+platforms.push({
+  x: 0,
+  y: innerHeight-margin,
+  width: innerWidth,
+  height: margin,
+  color: '#bebebe',
+});
+
 // TODO:
-// * make ground just another platform
 // * platforms can't be stacked on top of each-other
 // * fix bugs where you fall next to a platform & it bumps you back to the top of the platform only to fall again infinitely
 // * music
@@ -40,13 +49,6 @@ let platforms = _.range(num_platforms).map(function() {
 
 let players = [];
 let bullets = [];
-let ground = {
-  x: 0,
-  y: innerHeight-margin,
-  width: innerWidth,
-  height: margin,
-  color: '#bebebe',
-};
 let gravity = 10;
 
 let loopStarted = false;
@@ -86,13 +88,11 @@ function draw() {
   ctx.fillStyle = "#333333";
   ctx.fillRect(0, 0, innerWidth, innerHeight);
 
-  // draw the ground
-  ctx.fillStyle = ground.color;
-  ctx.fillRect(ground.x, ground.y, ground.width, ground.height);
-
   // draw platforms
-  for (let platform of platforms)
+  for (let platform of platforms) {
+    ctx.fillStyle = platform.color;
     ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+  }
   
   // draw the players
   for (let player of players) {
@@ -178,9 +178,8 @@ function updateStatus() {
 
     for (const [i, button] of gamepad.buttons.entries()) {
       if (i == 0) {
-        let is_touching_ground = player.y + player_height == ground.y;
         let is_touching_platform = platforms.some(platform => player.y + player_height == platform.y);
-        if (button.pressed && !player.jump_btn_pressed && (is_touching_ground || is_touching_platform)) {
+        if (button.pressed && !player.jump_btn_pressed && is_touching_platform) {
           player.jump_btn_pressed = true;
           player.dy = -15;
         }
@@ -219,13 +218,12 @@ function updateStatus() {
   }
 
   // updates
-  let ground_platforms = [...platforms, ground];
   for (let player of players) {
     if (player.dy < gravity)
       player.dy += 0.5;
 
     let player_goal = {...player, y: player.y + player.dy};
-    let overlapping_platform = ground_platforms.find(function(platform) {
+    let overlapping_platform = platforms.find(function(platform) {
       return player.dy > 0 && isOverlapping(platform, player_goal);
     });
 
