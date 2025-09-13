@@ -124,11 +124,20 @@ function draw() {
     else if (player.ix == 1)
       ctx.fillRect(canvas.width - bar_width - player_width, player_height, bar_width, player_height);
 
+    // draw weapon
     let {x, y} = player;
-    if (player.direction > 0)
+    if (player.direction == 1)
       x += player_width;
-    else
+    else if (player.direction == -1)
       x -= player_width;
+    else
+      x = 0;
+    if (player.direction == 2)
+      y += player_height;
+    else if (player.direction == -2)
+      y -= player_height;
+    else
+      y = 0;
     let width = player_width;
     let height = player_height / 5;
     let angle = player.direction > 0 ? -30 : 30;
@@ -167,12 +176,17 @@ function updateStatus() {
 
     let player = players.find(player => player.gamepad_ix == gamepad.index);
 
+    let x_axis;
     for (const [i, axis] of gamepad.axes.entries()) {
       if (i == 0 && (axis > 0.2 || axis < -0.2))
         player.x += axis * 10;
       // i == 2 for dual-stick
+      if (i == 0)
+        x_axis = axis;
       if (i == 0 && (axis > 0.2 || axis < -0.2))
         player.direction = axis > 0 ? 1 : -1;
+      if (i == 1 && Math.abs(x_axis) > Math.abs(axis))
+        player.direction = axis > 0 ? 2 : -2;
     }
 
     for (const [i, button] of gamepad.buttons.entries()) {
@@ -186,23 +200,23 @@ function updateStatus() {
           player.jump_btn_pressed = false;
         }
       }
-      else if (i == 2 && !isDead(player)) {
-        if (button.pressed && !player.melee_btn_pressed) {
-          player.melee_btn_pressed = true;
-          for (let other_player of players)
-            if (other_player != player && isInMeleeRange(other_player, player)) {
-              other_player.health -= melee_damage;
-              hurt_sounds.find(isNotPlaying)?.play();
-              if (other_player.x > player.x)
-                other_player.x += 75;
-              else
-                other_player.x -= 75;
-            }
-        }
-        else if (!button.pressed && player.melee_btn_pressed) {
-          player.melee_btn_pressed = false;
-        }
-      }
+      // else if (i == 2 && !isDead(player)) {
+      //   if (button.pressed && !player.melee_btn_pressed) {
+      //     player.melee_btn_pressed = true;
+      //     for (let other_player of players)
+      //       if (other_player != player && isInMeleeRange(other_player, player)) {
+      //         other_player.health -= melee_damage;
+      //         hurt_sounds.find(isNotPlaying)?.play();
+      //         if (other_player.x > player.x)
+      //           other_player.x += 75;
+      //         else
+      //           other_player.x -= 75;
+      //       }
+      //   }
+      //   else if (!button.pressed && player.melee_btn_pressed) {
+      //     player.melee_btn_pressed = false;
+      //   }
+      // }
       else if (i == 7 && !isDead(player)) {
         if (button.pressed && !player.ranged_btn_pressed) {
           player.ranged_btn_pressed = true;
@@ -244,7 +258,10 @@ function updateStatus() {
 
   let bullets_to_remove = [];
   for (let bullet of bullets) {
-    bullet.x += 15 * bullet.direction;
+    if (bullet.direction == 1 || bullet.direction == -1)
+      bullet.x += 15 * bullet.direction;
+    else
+      bullet.y += 7 * bullet.direction;
     for (let player of players) {
       if (!isDead(player) && bullet.player_ix != player.ix && isOverlapping(player, bullet)) {
         player.health -= ranged_damage;
@@ -259,17 +276,17 @@ function updateStatus() {
   draw();
 }
 
-function isInMeleeRange(other_player, player) {
-  let is_vert_overlap = Math.abs(other_player.y - player.y) < player_width;
-  // to get dist *between* take the x diff (left-most points) and subtract player width
-  let dist = Math.abs(other_player.x - player.x) - player_width;
-  let is_facing_other_player;
-  if (player.direction == 1)
-    is_facing_other_player = other_player.x >= player.x;
-  else
-    is_facing_other_player = other_player.x <= player.x;
-  return is_vert_overlap && is_facing_other_player && dist <= (player_width * 1.5);
-}
+// function isInMeleeRange(other_player, player) {
+//   let is_vert_overlap = Math.abs(other_player.y - player.y) < player_width;
+//   // to get dist *between* take the x diff (left-most points) and subtract player width
+//   let dist = Math.abs(other_player.x - player.x) - player_width;
+//   let is_facing_other_player;
+//   if (player.direction == 1)
+//     is_facing_other_player = other_player.x >= player.x;
+//   else
+//     is_facing_other_player = other_player.x <= player.x;
+//   return is_vert_overlap && is_facing_other_player && dist <= (player_width * 1.5);
+// }
 
 function isDead(player) {
   return player.health <= 0;
