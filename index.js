@@ -3,30 +3,77 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 let ctx = canvas.getContext("2d");
 
+let viewport_x = 0;
+let viewport_y = 0;
+let mouse_x;
+let mouse_y;
+document.addEventListener('mousemove', function(evt) {
+  mouse_x = evt.clientX + viewport_x;
+  mouse_y = evt.clientY + viewport_y;
+
+  if (cur_creating_platform) {
+    let new_x = mouse_x - mouse_x % platform_height;
+    let new_y = mouse_y - mouse_y % platform_height;
+    if (new_x != cur_creating_platform.x || new_y != cur_creating_platform.y) {
+      cur_creating_platform = {
+        x: new_x,
+        y: new_y,
+        width: platform_height,
+        height: platform_height,
+        color: '#bebebe',
+      };
+      platforms.push(cur_creating_platform);
+    }
+  }
+});
+
+let cur_creating_platform;
+document.addEventListener('mousedown', function(evt) {
+  mouse_x = evt.clientX + viewport_x;
+  mouse_y = evt.clientY + viewport_y;
+  cur_creating_platform = {
+    x: mouse_x - mouse_x % platform_height,
+    y: mouse_y - mouse_y % platform_height,
+    width: platform_height,
+    height: platform_height,
+    color: '#bebebe',
+  };
+  platforms.push(cur_creating_platform);
+});
+
+document.addEventListener('mouseup', function(evt) {
+  cur_creating_platform = null;
+});
+
 let hurt_sounds = _.range(10).map(() => new Audio('hitHurt.wav'));
 let shoot_sounds = _.range(10).map(() => new Audio('laserShoot.wav'));
 
 let player_height = 30;
 let player_width = 30;
+let platform_height = player_height;
 let bullet_width = 7;
 let bullet_height = 7;
 let margin = 100;
 let melee_damage = 10;
 let ranged_damage = 5;
 
-let num_platforms = _.random(4, 8);
-let platforms = _.range(num_platforms).map(function() {
-  let width = _.random(player_width * 4, innerWidth / 2);
-  let y = _.random(player_height, innerHeight - margin - player_height);
-  y -= y % player_height;
-  return {
-    height: player_height,
-    width,
-    x: _.random(0, innerWidth - width),
-    y,
-    color: '#bebebe'
-  };
-});
+let viewport_padding_x = 200;
+let viewport_padding_y = 100;
+
+let platforms = [];
+// let num_platforms = _.random(4, 8);
+// let platforms = _.range(num_platforms).map(function() {
+//   let width = _.random(player_width * 4, innerWidth / 2);
+//   let y = _.random(player_height, innerHeight - margin - player_height);
+//   y -= y % player_height;
+//   return {
+//     height: platform_height,
+//     width,
+//     x: _.random(0, innerWidth - width),
+//     y,
+//     color: '#bebebe'
+//   };
+// });
 
 // ground
 platforms.push({
@@ -83,9 +130,25 @@ window.addEventListener("gamepadconnected", (evt) => {
 });
 
 function draw() {
+  ctx.save();
+
+  viewport_x = 0;
+  viewport_y = 0;
+  if (players[0].x < 0 + viewport_padding_x)
+    viewport_x = players[0].x - viewport_padding_x;
+  else if (players[0].x > innerWidth - viewport_padding_x)
+    viewport_x = players[0].x - (innerWidth - viewport_padding_x);
+
+  if (players[0].y < 0 + viewport_padding_y)
+    viewport_y = players[0].y - viewport_padding_y;
+  else if (players[0].y > innerHeight - viewport_padding_y)
+    viewport_y = players[0].y - (innerHeight - viewport_padding_y);
+
+  ctx.translate(-viewport_x, -viewport_y);
+
   // draw the background
   ctx.fillStyle = "#333333";
-  ctx.fillRect(0, 0, innerWidth, innerHeight);
+  ctx.fillRect(viewport_x, viewport_y, innerWidth, innerHeight);
 
   // draw platforms
   for (let platform of platforms) {
@@ -150,12 +213,18 @@ function draw() {
     ctx.restore();
   }
 
+  // draw outline where a platform WOULD be placed
+  ctx.strokeStyle = "#666666";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(mouse_x - mouse_x % platform_height, mouse_y - mouse_y % platform_height, platform_height, platform_height);
+
   let live_players = players.filter(player => !isDead(player));
   if (players.length > 1 && live_players.length == 1) {
     ctx.font = "100px sans-serif";
     ctx.fillStyle = live_players[0].color;
     ctx.fillText(`Player ${live_players[0].ix + 1} wins!`, canvas.width / 3, canvas.height / 3);
   }
+  ctx.restore();
 }
 
 window.addEventListener("gamepaddisconnected", (evt) => {
