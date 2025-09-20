@@ -181,6 +181,12 @@ function draw() {
   if (max_player_x > max_x)
     viewport_x += max_player_x - max_x;
 
+  let scale_x = 0;
+  let player_x_diff = max_player_x - min_player_x;
+  let avail_width = innerWidth - viewport_padding_x * 2;
+  if (player_x_diff > avail_width)
+    scale_x = avail_width / player_x_diff;
+
   if (min_player_y < min_y)
     viewport_y -= min_y - min_player_y;
   if (max_player_y > max_y)
@@ -188,6 +194,8 @@ function draw() {
 
   ctx.save();
   ctx.translate(-viewport_x, -viewport_y);
+  if (scale_x)
+    ctx.scale(scale_x, scale_x);
 
   // draw the background
   ctx.fillStyle = "#333333";
