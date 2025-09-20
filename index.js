@@ -166,19 +166,25 @@ function addPlayer(gamepad_ix) {
 }
 
 function draw() {
-  let left_boundary = viewport_x + viewport_padding_x;
-  let right_boundary = viewport_x + innerWidth - viewport_padding_x;
-  if (players[0].x < left_boundary)
-    viewport_x -= left_boundary - players[0].x;
-  else if (players[0].x > right_boundary)
-    viewport_x += players[0].x - right_boundary;
+  let min_x = viewport_x + viewport_padding_x;
+  let max_x = viewport_x + innerWidth - viewport_padding_x;
+  let min_y = viewport_y + viewport_padding_y;
+  let max_y = viewport_y + innerHeight - viewport_padding_y;
 
-  let top_boundary = viewport_y + viewport_padding_y;
-  let bottom_boundary = viewport_y + innerHeight - viewport_padding_y;
-  if (players[0].y < top_boundary)
-    viewport_y -= top_boundary - players[0].y;
-  else if (players[0].y > bottom_boundary)
-    viewport_y += players[0].y - bottom_boundary;
+  let min_player_x = Math.min(..._.pluck(players, 'x'));
+  let max_player_x = Math.max(..._.pluck(players, 'x'));
+  let min_player_y = Math.min(..._.pluck(players, 'y'));
+  let max_player_y = Math.max(..._.pluck(players, 'y'));
+
+  if (min_player_x < min_x)
+    viewport_x -= min_x - min_player_x;
+  else if (max_player_x > max_x)
+    viewport_x += max_player_x - max_x;
+
+  if (min_player_y < min_y)
+    viewport_y -= min_y - min_player_y;
+  else if (max_player_y > max_y)
+    viewport_y += max_player_y - max_y;
 
   ctx.save();
   ctx.translate(-viewport_x, -viewport_y);
