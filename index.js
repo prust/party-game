@@ -166,7 +166,7 @@ function addPlayer(gamepad_ix) {
 }
 
 function draw() {
-  ctx.save();
+
 
   viewport_x = 0;
   viewport_y = 0;
@@ -180,6 +180,7 @@ function draw() {
   else if (players[0].y > innerHeight - viewport_padding_y)
     viewport_y = players[0].y - (innerHeight - viewport_padding_y);
 
+  ctx.save();
   ctx.translate(-viewport_x, -viewport_y);
 
   // draw the background
@@ -254,13 +255,31 @@ function draw() {
   ctx.lineWidth = 1;
   ctx.strokeRect(mouse_x - mouse_x % platform_height, mouse_y - mouse_y % platform_height, platform_height, platform_height);
 
+  ctx.restore();
+
+
+  // draw health bars & win state outside of viewport shift
+  for (let player of players) {
+    // don't draw dead players
+    if (isDead(player))
+      continue;
+
+    ctx.fillStyle = player.color;
+
+    // draw health bar
+    let bar_width = player_width * 8 * player.health / 100;
+    if (player.ix == 0)
+      ctx.fillRect(player_width, player_height, bar_width, player_height);
+    else if (player.ix == 1)
+      ctx.fillRect(canvas.width - bar_width - player_width, player_height, bar_width, player_height);
+  }
+  
   let live_players = players.filter(player => !isDead(player));
   if (players.length > 1 && live_players.length == 1) {
     ctx.font = "100px sans-serif";
     ctx.fillStyle = live_players[0].color;
     ctx.fillText(`Player ${live_players[0].ix + 1} wins!`, canvas.width / 3, canvas.height / 3);
   }
-  ctx.restore();
 }
 
 window.addEventListener("gamepaddisconnected", (evt) => {
