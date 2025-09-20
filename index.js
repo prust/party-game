@@ -124,7 +124,7 @@ platforms.push({
 
 let players = [];
 let bullets = [];
-let gravity = 100;
+let gravity = 1000;
 
 let loopStarted = false;
 
