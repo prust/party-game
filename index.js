@@ -16,12 +16,13 @@ document.addEventListener('mousemove', function(evt) {
     let new_x = snap(mouse_x);
     let new_y = snap(mouse_y);
     if (new_x != cur_creating_platform.x || new_y != cur_creating_platform.y) {
-      let is_platform = getPlatform(mouse_x, mouse_y);
-      if (is_removing && is_platform)
-        removePlatform(mouse_x, mouse_y);
-      else if (cur_creating_platform && !is_platform)
+      if (!getPlatform(mouse_x, mouse_y))
         createPlatform(mouse_x, mouse_y);
     }
+  }
+  else if (is_removing) {
+    if (getPlatform(mouse_x, mouse_y))
+      removePlatform(mouse_x, mouse_y);
   }
 });
 
@@ -30,7 +31,7 @@ document.addEventListener('mousedown', function(evt) {
   mouse_x = evt.clientX + viewport_x;
   mouse_y = evt.clientY + viewport_y;
   if (getPlatform(mouse_x, mouse_y)) {
-    removePlatform(mouse_x, mouse_x);
+    removePlatform(mouse_x, mouse_y);
     is_removing = true;
   }
   else {
@@ -128,10 +129,17 @@ let gravity = 10;
 let loopStarted = false;
 
 window.addEventListener("gamepadconnected", (evt) => {
+  addPlayer(evt.gamepad.index);
+});
+
+// TEMP: for debugging drawing w/out controller
+// addPlayer(0);
+
+function addPlayer(gamepad_ix) {
   let player = {
     dy: 2,
     y: innerHeight-margin-player_height,
-    gamepad_ix: evt.gamepad.index,
+    gamepad_ix: gamepad_ix,
     jump_btn_pressed: false,
     direction: 1,
     health: 100,
@@ -155,7 +163,7 @@ window.addEventListener("gamepadconnected", (evt) => {
   players.push(player);
 
   draw();
-});
+}
 
 function draw() {
   ctx.save();
