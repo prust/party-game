@@ -16,7 +16,7 @@ document.addEventListener('mousemove', function(evt) {
     let new_x = snap(mouse_x);
     let new_y = snap(mouse_y);
     if (new_x != cur_creating_platform.x || new_y != cur_creating_platform.y) {
-      let is_platform = isPlatform(mouse_x, mouse_y);
+      let is_platform = getPlatform(mouse_x, mouse_y);
       if (is_removing && is_platform)
         removePlatform(mouse_x, mouse_y);
       else if (cur_creating_platform && !is_platform)
@@ -29,7 +29,7 @@ let cur_creating_platform;
 document.addEventListener('mousedown', function(evt) {
   mouse_x = evt.clientX + viewport_x;
   mouse_y = evt.clientY + viewport_y;
-  if (isPlatform(mouse_x, mouse_y)) {
+  if (getPlatform(mouse_x, mouse_y)) {
     removePlatform(mouse_x, mouse_x);
     is_removing = true;
   }
@@ -43,7 +43,7 @@ document.addEventListener('mouseup', function(evt) {
   is_removing = false;
 });
 
-function isPlatform(x, y) {
+function getPlatform(x, y) {
   return platform_ix[`${snap(x)},${snap(y)}`];
 }
 
@@ -57,6 +57,13 @@ function createPlatform(x, y) {
   };
   platforms.push(cur_creating_platform);
   platform_ix[`${snap(x)},${snap(y)}`] = cur_creating_platform;
+}
+
+function removePlatform(x, y) {
+  let platform = getPlatform(x, y);
+  let ix = platforms.indexOf(platform);
+  platforms.splice(ix, 1);
+  delete platform_ix[`${snap(x)},${snap(y)}`];
 }
 
 // snaps x or y to the platform grid
