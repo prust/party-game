@@ -7,22 +7,20 @@ let viewport_x = 0;
 let viewport_y = 0;
 let mouse_x;
 let mouse_y;
+let is_removing = false;
 document.addEventListener('mousemove', function(evt) {
   mouse_x = evt.clientX + viewport_x;
   mouse_y = evt.clientY + viewport_y;
 
   if (cur_creating_platform) {
-    let new_x = mouse_x - mouse_x % platform_height;
-    let new_y = mouse_y - mouse_y % platform_height;
+    let new_x = snap(mouse_x);
+    let new_y = snap(mouse_y);
     if (new_x != cur_creating_platform.x || new_y != cur_creating_platform.y) {
-      cur_creating_platform = {
-        x: new_x,
-        y: new_y,
-        width: platform_height,
-        height: platform_height,
-        color: '#bebebe',
-      };
-      platforms.push(cur_creating_platform);
+      let is_platform = isPlatform(mouse_x, mouse_y);
+      if (is_removing && is_platform)
+        removePlatform(mouse_x, mouse_y);
+      else if (cur_creating_platform && !is_platform)
+        createPlatform(mouse_x, mouse_y);
     }
   }
 });
@@ -31,19 +29,42 @@ let cur_creating_platform;
 document.addEventListener('mousedown', function(evt) {
   mouse_x = evt.clientX + viewport_x;
   mouse_y = evt.clientY + viewport_y;
+  if (isPlatform(mouse_x, mouse_y)) {
+    removePlatform(mouse_x, mouse_x);
+    is_removing = true;
+  }
+  else {
+    createPlatform(mouse_x, mouse_y);
+  }
+});
+
+document.addEventListener('mouseup', function(evt) {
+  cur_creating_platform = null;
+  is_removing = false;
+});
+
+function isPlatform(x, y) {
+  return platform_ix[`${snap(x)},${snap(y)}`];
+}
+
+function createPlatform(x, y) {
   cur_creating_platform = {
-    x: mouse_x - mouse_x % platform_height,
-    y: mouse_y - mouse_y % platform_height,
+    x: snap(x),
+    y: snap(y),
     width: platform_height,
     height: platform_height,
     color: '#bebebe',
   };
   platforms.push(cur_creating_platform);
-});
+  platform_ix[`${snap(x)},${snap(y)}`] = cur_creating_platform;
+}
 
-document.addEventListener('mouseup', function(evt) {
-  cur_creating_platform = null;
-});
+// snaps x or y to the platform grid
+function snap(px) {
+  return px - px % platform_height;
+}
+
+let platform_ix = {};
 
 let hurt_sounds = _.range(10).map(() => new Audio('hitHurt.wav'));
 let shoot_sounds = _.range(10).map(() => new Audio('laserShoot.wav'));
