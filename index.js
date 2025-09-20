@@ -183,7 +183,7 @@ function draw() {
   if (player_y_diff > avail_height)
     scale_y = avail_height / player_y_diff;
 
-  let scale = Math.max(scale_x, scale_y);
+  let scale = Math.min(scale_x, scale_y);
 
   let min_x = viewport_x + viewport_padding_x/scale;
   let max_x = viewport_x + innerWidth/scale - viewport_padding_x/scale;
