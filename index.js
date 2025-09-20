@@ -241,7 +241,7 @@ function draw() {
     // ctx.translate(x + width/2, y + height/2); // origin of rotation on one side
     // ctx.rotate(angle * Math.PI / 180);
     // ctx.fillRect(-width/2, -height/2, width, height); // draw rect centered at (0,0)
-    ctx.restore();
+    // ctx.restore();
   }
 
   // draw outline where a platform WOULD be placed
