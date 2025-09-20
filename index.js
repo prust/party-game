@@ -178,12 +178,12 @@ function draw() {
 
   if (min_player_x < min_x)
     viewport_x -= min_x - min_player_x;
-  else if (max_player_x > max_x)
+  if (max_player_x > max_x)
     viewport_x += max_player_x - max_x;
 
   if (min_player_y < min_y)
     viewport_y -= min_y - min_player_y;
-  else if (max_player_y > max_y)
+  if (max_player_y > max_y)
     viewport_y += max_player_y - max_y;
 
   ctx.save();
