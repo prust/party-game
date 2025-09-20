@@ -177,10 +177,18 @@ function draw() {
   if (player_x_diff > avail_width)
     scale_x = avail_width / player_x_diff;
 
-  let min_x = viewport_x + viewport_padding_x/scale_x;
-  let max_x = viewport_x + innerWidth/scale_x - viewport_padding_x/scale_x;
-  let min_y = viewport_y + viewport_padding_y;
-  let max_y = viewport_y + innerHeight - viewport_padding_y;
+  let player_y_diff = max_player_y - min_player_y;
+  let avail_height = innerHeight - viewport_padding_y * 2;
+  let scale_y = 1;
+  if (player_y_diff > avail_height)
+    scale_y = avail_height / player_y_diff;
+
+  let scale = Math.max(scale_x, scale_y);
+
+  let min_x = viewport_x + viewport_padding_x/scale;
+  let max_x = viewport_x + innerWidth/scale - viewport_padding_x/scale;
+  let min_y = viewport_y + viewport_padding_y/scale;
+  let max_y = viewport_y + innerHeight/scale - viewport_padding_y/scale;
 
   if (min_player_x < min_x)
     viewport_x -= min_x - min_player_x;
@@ -194,11 +202,11 @@ function draw() {
 
   ctx.save();
   ctx.translate(-viewport_x, -viewport_y);
-  ctx.scale(scale_x, scale_x);
+  ctx.scale(scale, scale);
 
   // draw the background
   ctx.fillStyle = "#333333";
-  ctx.fillRect(viewport_x, viewport_y, innerWidth/scale_x, innerHeight/scale_x);
+  ctx.fillRect(viewport_x, viewport_y, innerWidth/scale, innerHeight/scale);
 
   // draw platforms
   for (let platform of platforms) {
