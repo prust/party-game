@@ -173,10 +173,12 @@ function draw() {
   else if (players[0].x > right_boundary)
     viewport_x += players[0].x - right_boundary;
 
-  if (players[0].y < 0 + viewport_padding_y)
-    viewport_y = players[0].y - viewport_padding_y;
-  else if (players[0].y > innerHeight - viewport_padding_y)
-    viewport_y = players[0].y - (innerHeight - viewport_padding_y);
+  let top_boundary = viewport_y + viewport_padding_y;
+  let bottom_boundary = viewport_y + innerHeight - viewport_padding_y;
+  if (players[0].y < top_boundary)
+    viewport_y -= top_boundary - players[0].y;
+  else if (players[0].y > bottom_boundary)
+    viewport_y += players[0].y - bottom_boundary;
 
   ctx.save();
   ctx.translate(-viewport_x, -viewport_y);
