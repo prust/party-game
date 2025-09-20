@@ -217,36 +217,30 @@ function draw() {
 
     ctx.fillStyle = player.color;
 
-    // draw health bar
-    let bar_width = player_width * 8 * player.health / 100;
-    if (player.ix == 0)
-      ctx.fillRect(player_width, player_height, bar_width, player_height);
-    else if (player.ix == 1)
-      ctx.fillRect(canvas.width - bar_width - player_width, player_height, bar_width, player_height);
-
     // draw weapon
-    let {x, y} = player;
-    if (player.direction == 1)
-      x += player_width;
-    else if (player.direction == -1)
-      x -= player_width;
-    else
-      x = 0;
+    // let {x, y} = player;
+    // if (player.direction == 1)
+    //   x += player_width;
+    // else if (player.direction == -1)
+    //   x -= player_width;
+    // else
+    //   x = 0;
+
     // if (player.direction == 2)
     //   y += player_height;
     // else if (player.direction == -2)
     //   y -= player_height;
     // else
-      y = 0;
-    let width = player_width;
-    let height = player_height / 5;
-    let angle = player.direction > 0 ? -30 : 30;
+    //   y = 0;
+    // let width = player_width;
+    // let height = player_height / 5;
+    // let angle = player.direction > 0 ? -30 : 30;
 
     
-    ctx.save();
-    ctx.translate(x + width/2, y + height/2); // origin of rotation on one side
-    ctx.rotate(angle * Math.PI / 180);
-    ctx.fillRect(-width/2, -height/2, width, height); // draw rect centered at (0,0)
+    // ctx.save();
+    // ctx.translate(x + width/2, y + height/2); // origin of rotation on one side
+    // ctx.rotate(angle * Math.PI / 180);
+    // ctx.fillRect(-width/2, -height/2, width, height); // draw rect centered at (0,0)
     ctx.restore();
   }
 
