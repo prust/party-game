@@ -166,10 +166,12 @@ function addPlayer(gamepad_ix) {
 }
 
 function draw() {
-  if (players[0].x < 0 + viewport_padding_x)
-    viewport_x = players[0].x - viewport_padding_x;
-  else if (players[0].x > innerWidth - viewport_padding_x)
-    viewport_x = players[0].x - (innerWidth - viewport_padding_x);
+  let left_boundary = viewport_x + viewport_padding_x;
+  let right_boundary = viewport_x + innerWidth - viewport_padding_x;
+  if (players[0].x < left_boundary)
+    viewport_x -= left_boundary - players[0].x;
+  else if (players[0].x > right_boundary)
+    viewport_x += players[0].x - right_boundary;
 
   if (players[0].y < 0 + viewport_padding_y)
     viewport_y = players[0].y - viewport_padding_y;
