@@ -124,7 +124,7 @@ platforms.push({
 
 let players = [];
 let bullets = [];
-let gravity = 30;
+let gravity = 100;
 
 let loopStarted = false;
 
@@ -367,10 +367,13 @@ function updateStatus() {
       });
     }
 
-    if (landing_platform)
+    if (landing_platform) {
       player.y = landing_platform.y - player_height;
-    else
+      player.dy = 0; // keeps gravity from increasing player's dy while on a platform
+    }
+    else {
       player.y += player.dy;
+    }
   }
 
 
