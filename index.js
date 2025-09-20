@@ -198,7 +198,7 @@ function draw() {
 
   // draw the background
   ctx.fillStyle = "#333333";
-  ctx.fillRect(viewport_x, viewport_y, innerWidth, innerHeight);
+  ctx.fillRect(viewport_x, viewport_y, innerWidth/scale_x, innerHeight/scale_x);
 
   // draw platforms
   for (let platform of platforms) {
