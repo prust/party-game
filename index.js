@@ -231,11 +231,11 @@ function draw() {
       x -= player_width;
     else
       x = 0;
-    if (player.direction == 2)
-      y += player_height;
-    else if (player.direction == -2)
-      y -= player_height;
-    else
+    // if (player.direction == 2)
+    //   y += player_height;
+    // else if (player.direction == -2)
+    //   y -= player_height;
+    // else
       y = 0;
     let width = player_width;
     let height = player_height / 5;
@@ -290,8 +290,8 @@ function updateStatus() {
         x_axis = axis;
       if (i == 0 && (axis > 0.2 || axis < -0.2))
         player.direction = axis > 0 ? 1 : -1;
-      if (i == 1 && Math.abs(x_axis) > Math.abs(axis))
-        player.direction = axis > 0 ? 2 : -2;
+      // if (i == 1 && Math.abs(x_axis) > Math.abs(axis))
+      //   player.direction = axis > 0 ? 2 : -2;
     }
 
     for (const [i, button] of gamepad.buttons.entries()) {
