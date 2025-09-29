@@ -8,6 +8,13 @@ let viewport_y = 0;
 let mouse_x;
 let mouse_y;
 let is_removing = false;
+let draw_block_type = 0;
+document.addEventListener('keyup', function(evt) {
+  if (evt.code == '1'.charCodeAt(0))
+    draw_block_type = 1;
+  else if (evt.code == '0'.charCodeAt(0))
+    draw_block_type = 0;
+});
 document.addEventListener('mousemove', function(evt) {
   mouse_x = evt.clientX + viewport_x;
   mouse_y = evt.clientY + viewport_y;
@@ -42,6 +49,8 @@ document.addEventListener('mousedown', function(evt) {
 document.addEventListener('mouseup', function(evt) {
   cur_creating_platform = null;
   is_removing = false;
+  if (draw_block_type == 1)
+    createCollectible(evt.clientX, evt.clientY);
 });
 
 function getPlatform(x, y) {
@@ -58,6 +67,17 @@ function createPlatform(x, y) {
   };
   platforms.push(cur_creating_platform);
   platform_ix[`${snap(x)},${snap(y)}`] = cur_creating_platform;
+}
+
+function createCollectible(x, y) {
+  collectibles.push({
+    type: draw_block_type,
+    x: snap(x),
+    y: snap(y),
+    width: platform_height,
+    height: platform_height,
+    color: '#fcc600',
+  });
 }
 
 function removePlatform(x, y) {
@@ -114,9 +134,7 @@ platforms.push({
 });
 
 // TODO:
-// * don't allow platforms to be stacked on top of each-other
 // * music
-// * slicing animation
 // * aiming up or down via left knob
 // * taking damage animation (flashing white?)
 // * powerups
@@ -212,6 +230,11 @@ function draw() {
   for (let platform of platforms) {
     ctx.fillStyle = platform.color;
     ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+  }
+
+  for (let collectible of collectibles) {
+    ctx.fillStyle = collectible.color;
+    ctx.fillRect(collectible.x, collectible.y, collectible.width, collectible.height);
   }
   
   // draw the players
