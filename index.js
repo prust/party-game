@@ -143,7 +143,6 @@ platforms.push({
 
 let players = [];
 let bullets = [];
-let gravity = 1000;
 
 let loopStarted = false;
 
@@ -166,6 +165,7 @@ function addPlayer(gamepad_ix) {
     ranged_btn_pressed: false,
     width: player_width,
     height: player_height,
+    gravity: 1000,
   };
 
   if (players.length) {
@@ -395,8 +395,14 @@ function updateStatus() {
 
   // updates
   for (let player of players) {
-    if (player.dy < gravity)
-      player.dy += 0.5;
+    if (player.gravity > 0) {
+      if (player.dy < player.gravity)
+        player.dy += 0.5;
+    }
+    else if (player.gravity < 0) {
+      if (player.dy > player.gravity)
+        player.dy -= 0.5;
+    }
 
     let landing_platform;
     // only land on a platform if the player is moving downwards (dy > 0)
@@ -421,6 +427,15 @@ function updateStatus() {
     }
   }
 
+
+  for (let collectible of collectibles) {
+    if (isOverlapping(player, collectible)) {
+      if (collectible.type == 1) {
+        player.gravity = -player.gravity;
+        collectibles.splice(collectibles.indexOf(collectible), 1);
+      }
+    }
+  }
 
   let bullets_to_remove = [];
   for (let bullet of bullets) {
