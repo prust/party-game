@@ -409,19 +409,21 @@ function updateStatus() {
 
       // this only checks if it's colliding with one platform
       // it's possible the player could collide with multiple - we should handle that
-      let x_overlap, y_overlap;
+      let x_overlap, y_overlap, colliding_platform;
       for (let platform of platforms) {
         x_overlap = getXOverlap(dest, platform);
         y_overlap = getYOverlap(dest, platform);
-        if (x_overlap > 0 || y_overlap > 0)
+        if (x_overlap > 0 || y_overlap > 0) {
+          colliding_platform = platform;
           break;
+        }
       }
 
       if (y_overlap > 0) {
         if (player.dy > 0)
-          player.y = dest.y - ((player.y + player.height) - platform.y);
+          player.y = dest.y - ((player.y + player.height) - colliding_platform.y);
         else if (player.dy < 0)
-          player.y = dest.y + (player.y - (platform.y + platform.height));
+          player.y = dest.y + (player.y - (colliding_platform.y + colliding_platform.height));
 
         player.dy = 0;
       }
