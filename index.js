@@ -10,9 +10,9 @@ let mouse_y;
 let is_removing = false;
 let draw_block_type = 0;
 document.addEventListener('keyup', function(evt) {
-  if (evt.code == '1'.charCodeAt(0))
+  if (evt.code == 'Digit1')
     draw_block_type = 1;
-  else if (evt.code == '0'.charCodeAt(0))
+  else if (evt.code == 'Digit0')
     draw_block_type = 0;
 });
 document.addEventListener('mousemove', function(evt) {
@@ -110,6 +110,7 @@ let viewport_padding_x = 200;
 let viewport_padding_y = 100;
 
 let platforms = [];
+let collectibles = [];
 // let num_platforms = _.random(4, 8);
 // let platforms = _.range(num_platforms).map(function() {
 //   let width = _.random(player_width * 4, innerWidth / 2);
